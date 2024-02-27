@@ -8,19 +8,26 @@ import (
 
 // GetAPIKey -
 func TestGetAPIKey(t *testing.T) {
-	testHeaderOne := http.Header{}
-	testHeaderOne.Add("Authorization", "ApiKey Pass")
+	testHeaderPass := http.Header{}
+	testHeaderPass.Add("Authorization", "ApiKey Pass")
 
-	testHeaderTwo := http.Header{}
-	testHeaderTwo.Add("Authorization", "ApiKe Fail")
+	testHeaderNoAuth := http.Header{}
+
+	testHeaderMalformedFirstElement := http.Header{}
+	testHeaderMalformedFirstElement.Add("Authorization", "ApiKe Fail")
+
+	testHeaderMalformedLength := http.Header{}
+	testHeaderMalformedLength.Add("Authorization", "ApiKeyFail")
 
 	tests := map[string]struct {
 		input http.Header
 		want  string
 		err   error
 	}{
-		"simple":  {input: testHeaderOne, want: "Pass", err: nil},
-		"simple1": {input: testHeaderTwo, want: "", err: ErrMalformedHeader},
+		"Header Auth Pass":                    {input: testHeaderPass, want: "Pass", err: nil},
+		"Header Auth Empty":                   {input: testHeaderNoAuth, want: "", err: ErrNoAuthHeaderIncluded},
+		"Header Auth Malformed First Element": {input: testHeaderMalformedFirstElement, want: "", err: ErrMalformedHeader},
+		"Header Auth Malformed Length":        {input: testHeaderMalformedLength, want: "", err: ErrMalformedHeader},
 	}
 
 	for name, tc := range tests {
